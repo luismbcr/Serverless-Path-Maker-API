@@ -5,19 +5,37 @@ module.exports = async function(context, req) {
   context.log("JavaScript HTTP trigger function processed a request.");
   try {
     const client = await MongoClient.connect(process.env.DBURL, {
-        useNewUrlParser: true
-      });
+      useNewUrlParser: true
+    });
     const db = client.db();
     const col = db.collection("paths");
+    let validPath;
+    console.log("here " + method);
     switch (method) {
       case "POST":
-        const validPath = helpers.formatPath(req.body);
+        {
+        }
+        validPath = helpers.formatPath(req.body, "POST");
         if (!validPath) return false;
         const inserted = await col.insert(validPath);
-        if (inserted.insertedCount >0){
-            helpers.toJson(context, inserted.ops[0]);
-        }else{
-            helpers.toJson(context, {});
+        if (inserted.insertedCount > 0) {
+          helpers.toJson(context, inserted.ops[0]);
+        } else {
+          helpers.toJson(context, {});
+        }
+        break;
+      case "PUT":
+        if (!req.body.id) return false;
+        validPath = helpers.formatPath(req.body);
+        if (!validPath) return false;
+        const updated = await col.updateOne(
+          { _id: ObjectID(req.body.id) },
+          { $set: validPath }
+        );
+        if (updated.modifiedCount > 0) {
+          helpers.toJson(context, req.body);
+        } else {
+          helpers.toJson(context, {});
         }
         break;
       default:
@@ -31,7 +49,7 @@ module.exports = async function(context, req) {
             searchQuery = { _id: "" };
           }
         }
-        
+
         const docs = await col.find(searchQuery).toArray();
 
         const response = docs.length == 1 ? docs[0] : docs;

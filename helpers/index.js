@@ -5,14 +5,18 @@ module.exports = {
             headers: { "Content-Type": "application/json" }
           }
     },
-    formatPath: (path)=>{
+    formatPath: (path, method = "")=>{
         if(path.title && path.description){
-            return {
+            const newPath ={
                 "title": path.title,
                 "description": path.description,
-                "items": [],
-                "createdAt":new Date()
+                "status":(path.status) ? path.status : 0,
+                "items": (path.items) ? path.items : []
             }
+            if (method === "POST"){
+                newPath["createdAt"]= new Date();
+            }
+            return newPath;
         }
         return false;
     }
