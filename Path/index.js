@@ -38,6 +38,17 @@ module.exports = async function(context, req) {
           helpers.toJson(context, {});
         }
         break;
+      case "DELETE":
+        if (!query.id) return false;
+        const deleted = await col.deleteOne(
+          { _id: ObjectID(query.id) }
+        );
+        if (deleted.deletedCount > 0) {
+          helpers.toJson(context, {"status":"deleted"});
+        } else {
+          helpers.toJson(context, {});
+        }
+        break;
       default:
         //GET
         let searchQuery = {};
