@@ -4,9 +4,21 @@ module.exports = async function(context, req) {
   const { method, query } = req;
   context.log("JavaScript HTTP trigger function processed a request.");
   try {
+    const client = await MongoClient.connect(process.env.DBURL, {
+        useNewUrlParser: true
+      });
+    const db = client.db();
+    const col = db.collection("paths");
     switch (method) {
       case "POST":
-        console.log("test");
+        const validPath = helpers.formatPath(req.body);
+        if (!validPath) return false;
+        const inserted = await col.insert(validPath);
+        if (inserted.insertedCount >0){
+            helpers.toJson(context, inserted.ops[0]);
+        }else{
+            helpers.toJson(context, {});
+        }
         break;
       default:
         //GET
@@ -19,19 +31,15 @@ module.exports = async function(context, req) {
             searchQuery = { _id: "" };
           }
         }
-        const client = await MongoClient.connect(process.env.DBURL, {
-          useNewUrlParser: true
-        });
-        const db = client.db();
-        const col = db.collection("paths");
+        
         const docs = await col.find(searchQuery).toArray();
 
         const response = docs.length == 1 ? docs[0] : docs;
         helpers.toJson(context, response);
-        client.close();
-        context.done();
         break;
     }
+    client.close();
+    context.done();
   } catch (e) {
     console.error(e);
   }
