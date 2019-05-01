@@ -1,0 +1,24 @@
+{
+  "name": "pathapi",
+  "version": "1.0.0",
+  "description": "This is an API serverless project using azure to handle paths and topics.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luismbcr/Serverless-Path-Maker-API.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/luismbcr/Serverless-Path-Maker-API/issues"
+  },
+  "homepage": "https://github.com/luismbcr/Serverless-Path-Maker-API#readme",
+  "dependencies": {
+    "jsonwebtoken": "^8.5.1",
+    "jwks-rsa": "^1.4.0",
+    "mongodb": "^3.2.3"
+  }
+}
