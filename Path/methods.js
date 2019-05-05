@@ -20,11 +20,11 @@ module.exports = async (context, {method, query, body})=>{
         }
         break;
       case "PUT":
-        if (!body.id) return false;
+        if (!body._id) return false;
         validPath = helpers.formatPath(body);
         if (!validPath) return false;
         const updated = await col.updateOne(
-          { _id: ObjectID(body.id) },
+          { _id: ObjectID(body._id) },
           { $set: validPath }
         );
         if (updated.modifiedCount > 0) {
@@ -34,9 +34,9 @@ module.exports = async (context, {method, query, body})=>{
         }
         break;
       case "DELETE":
-        if (!query.id) return false;
+        if (!query._id) return false;
         const deleted = await col.deleteOne(
-          { _id: ObjectID(query.id) }
+          { _id: ObjectID(query._id) }
         );
         if (deleted.deletedCount > 0) {
           helpers.toJson(context, {"status":"deleted"});
@@ -47,10 +47,10 @@ module.exports = async (context, {method, query, body})=>{
       default:
         //GET
         let searchQuery = {};
-        if (query.id) {
+        if (query._id) {
           //validate id format
-          if (query.id.length > 23) {
-            searchQuery = { _id: ObjectID(query.id) };
+          if (query._id.length > 23) {
+            searchQuery = { _id: ObjectID(query._id) };
           } else {
             searchQuery = { _id: "" };
           }
