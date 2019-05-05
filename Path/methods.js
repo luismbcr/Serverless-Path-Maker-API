@@ -58,7 +58,7 @@ module.exports = async (context, {method, query, body}, isLogged)=>{
         console.log(searchQuery)
         const docs = await col.find(searchQuery).toArray();
 
-        const response = docs.length == 1 ? docs[0] : docs;
+        const response = (docs.length  == 1 && query._id)? docs[0] : docs;
         helpers.toJson(context, response);
         break;
     }
