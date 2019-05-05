@@ -8,7 +8,7 @@ module.exports = async function(context, req) {
   try {
     const isLogged = await auth.checkToken(req);
     if(isLogged.nickname){
-      await methods(context, req);
+      await methods(context, req, isLogged);
     }    
   } catch (e) {
     console.error(e);

@@ -1,7 +1,7 @@
 const { MongoClient, ObjectID } = require("mongodb");
 const helpers = require("../helpers");
 
-module.exports = async (context, {method, query, body})=>{
+module.exports = async (context, {method, query, body}, isLogged)=>{
     const client = await MongoClient.connect(process.env.DBURL, {
         useNewUrlParser: true
     });
@@ -10,7 +10,7 @@ module.exports = async (context, {method, query, body})=>{
     let validPath;
     switch (method) {
       case "POST":
-        validPath = helpers.formatPath(body, "POST");
+        validPath = helpers.formatPath(body, "POST", isLogged);
         if (!validPath) return false;
         const inserted = await col.insert(validPath);
         if (inserted.insertedCount > 0) {
@@ -21,7 +21,7 @@ module.exports = async (context, {method, query, body})=>{
         break;
       case "PUT":
         if (!body._id) return false;
-        validPath = helpers.formatPath(body);
+        validPath = helpers.formatPath(body,"PUT",isLogged);
         if (!validPath) return false;
         const updated = await col.updateOne(
           { _id: ObjectID(body._id) },
@@ -46,16 +46,16 @@ module.exports = async (context, {method, query, body})=>{
         break;
       default:
         //GET
-        let searchQuery = {};
+        let searchQuery = { "user":isLogged.nickname };
         if (query._id) {
           //validate id format
           if (query._id.length > 23) {
-            searchQuery = { _id: ObjectID(query._id) };
+            searchQuery = {...searchQuery, _id: ObjectID(query._id) };
           } else {
-            searchQuery = { _id: "" };
+            searchQuery = {...searchQuery, _id: ""};
           }
         }
-
+        console.log(searchQuery)
         const docs = await col.find(searchQuery).toArray();
 
         const response = docs.length == 1 ? docs[0] : docs;
